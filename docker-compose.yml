@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  unsplash_db:
+    image: postgres:latest
+    container_name: upsplash_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: unsplash
+    ports:
+      - "5432:5432"
+
+volumes:
+  usplash_db:
+    driver: local
