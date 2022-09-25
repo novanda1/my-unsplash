@@ -1,29 +1,42 @@
 package storage
 
 import (
+	"context"
+	"fmt"
+	"log"
+	"time"
+
 	"github.com/novanda1/my-unsplash/conf"
-	"github.com/novanda1/my-unsplash/models"
-	"github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/pkg/errors"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 type Connection struct {
-	*gorm.DB
+	*mongo.Client
 }
 
 func Dial(config *conf.GlobalConfiguration) (*Connection, error) {
-	db, err := gorm.Open(postgres.Open(config.DB.URL), &gorm.Config{})
+	client, err := mongo.NewClient(options.Client().ApplyURI(config.DB.URL))
+
 	if err != nil {
 		return nil, errors.Wrap(err, "opening database connection")
 	}
 
-	err = db.AutoMigrate(&models.Image{})
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	err = client.Connect(ctx)
 	if err != nil {
-		logrus.Fatalf("cannot migrate table: %v", err)
+		log.Fatal(err)
 	}
+	defer client.Disconnect(ctx)
 
-	return &Connection{db}, nil
+	databases, err := client.ListDatabaseNames(ctx, bson.M{})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("database are %v", databases)
+
+	return &Connection{client}, nil
 }
