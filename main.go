@@ -28,6 +28,9 @@ func main() {
 
 	api := api.NewApi(config, db)
 
+	// seed database
+	// models.Seed(db)
+
 	l := fmt.Sprintf("%v:%v", config.API.Host, config.API.Port)
 	api.ListenAndServe(l)
 }
