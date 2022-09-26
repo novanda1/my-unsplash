@@ -95,3 +95,19 @@ func GetImages(storage *storage.Connection, p *GetImageDTO) ([]Image, error) {
 
 	return images, nil
 }
+
+func GetImage(storage *storage.Connection, id string) (*Image, error) {
+	image := new(Image)
+
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx := context.Background()
+	result := storage.ImageCollection().FindOne(ctx, bson.M{"_id": objectId})
+
+	result.Decode(image)
+
+	return image, nil
+}

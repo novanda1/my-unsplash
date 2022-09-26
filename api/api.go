@@ -34,6 +34,7 @@ func NewApi(config *conf.GlobalConfiguration, db *storage.Connection) *API {
 
 	v1_image_route.Post("/", api.AddIMage)
 	v1_image_route.Get("/", api.GetImagesWithPagination)
+	v1_image_route.Get("/:id", api.GetImage)
 
 	app.Use(logger.New())
 	api.handler = app
