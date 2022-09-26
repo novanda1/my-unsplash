@@ -14,10 +14,10 @@ import (
 )
 
 type Image struct {
-	ID        primitive.ObjectID `bson:"_id,omitempty"`
-	Label     string             `bson:"label,omitempty"`
-	Url       string             `bson:"url,omitempty"`
-	CreatedAt int64              `json:"created_at"`
+	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	Label     string             `bson:"label,omitempty" json:"label"`
+	Url       string             `bson:"url,omitempty" json:"url"`
+	CreatedAt int64              `json:"createdAt"`
 }
 
 type InsertImageDTO struct {
