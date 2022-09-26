@@ -17,8 +17,8 @@ type Image struct {
 }
 
 type InsertImageDTO struct {
-	Label string `json:"label"`
-	Url   string `json:"url"`
+	Label string `json:"label" validate:"required,min=3,max=25"`
+	Url   string `json:"url" validate:"required,min=10"`
 }
 
 func SaveImage(ctx context.Context, storage *storage.Connection, p *InsertImageDTO) (*mongo.InsertOneResult, error) {

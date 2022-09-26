@@ -3,19 +3,52 @@ package api
 import (
 	"fmt"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/novanda1/my-unsplash/models"
 )
+
+type ErrorResponse struct {
+	FailedField string
+	Tag         string
+	Value       string
+}
+
+var validate = validator.New()
+
+func ValidateInsertImageParams(insertImageParams models.InsertImageDTO) []*ErrorResponse {
+	var errors []*ErrorResponse
+	err := validate.Struct(insertImageParams)
+	if err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			var element ErrorResponse
+			element.FailedField = err.StructNamespace()
+			element.Tag = err.Tag()
+			element.Value = err.Param()
+			errors = append(errors, &element)
+		}
+	}
+	return errors
+}
 
 func (a *API) AddIMage(c *fiber.Ctx) error {
 	c.Accepts("application/json")
 	ctx := c.Context()
 
 	var resp Response
-	params := new(models.InsertImageDTO)
 
+	params := new(models.InsertImageDTO)
 	if err := c.BodyParser(params); err != nil {
 		return err
+	}
+
+	errors := ValidateInsertImageParams(*params)
+	if errors != nil {
+		resp.Status = "error"
+		resp.Data = errors
+		resp.Message = "body error"
+
+		return c.Status(fiber.StatusBadRequest).JSON(resp)
 	}
 
 	result, err := models.SaveImage(ctx, a.db, params)
@@ -29,7 +62,7 @@ func (a *API) AddIMage(c *fiber.Ctx) error {
 
 	resp.Status = "success"
 	resp.Data = result
-	resp.Message = ""
+	resp.Message = "Succesfully added new image!"
 
 	return c.JSON(resp)
 }
