@@ -2,9 +2,9 @@ package models
 
 import (
 	"context"
+	"errors"
 
 	"github.com/novanda1/my-unsplash/storage"
-	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -17,36 +17,38 @@ type Image struct {
 }
 
 type InsertImageDTO struct {
-	label string
-	url   string
+	Label string `json:"label"`
+	Url   string `json:"url"`
 }
 
-func (Image) SaveImage(ctx context.Context, storage *storage.Connection, p InsertImageDTO) *mongo.InsertOneResult {
+func SaveImage(ctx context.Context, storage *storage.Connection, p *InsertImageDTO) (*mongo.InsertOneResult, error) {
 	image := Image{
-		Label: p.label,
-		Url:   p.url,
+		Label: p.Label,
+		Url:   p.Url,
 	}
 
 	result, err := storage.ImageCollection().InsertOne(ctx, image)
 	if err != nil {
-		logrus.Panicf("Failed to insert image %s", err.Error())
+		return nil, err
 	}
 
-	return result
+	return result, bson.ErrDecodeToNil
 }
 
-func (Image) DeleteImage(ctx context.Context, storage *storage.Connection, id string) {
+func DeleteImage(ctx context.Context, storage *storage.Connection, id string) error {
 	idPrimitive, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		logrus.Fatal("primitive.ObjectIDFromHex ERROR:", err)
+		return err
 	}
 
 	result, err := storage.ImageCollection().DeleteOne(ctx, bson.M{"_id": idPrimitive})
 	if err != nil {
-		logrus.Fatal("error deleting object:", err)
+		return err
 	}
 
 	if result.DeletedCount == 0 {
-		logrus.Error("object not found")
+		return errors.New("object not found")
 	}
+
+	return nil
 }
