@@ -117,6 +117,10 @@ func GetImage(storage *storage.Connection, id string) (*Image, error) {
 	ctx := context.Background()
 	result := storage.ImageCollection().FindOne(ctx, bson.M{"_id": objectId})
 
+	if result.Err() != nil {
+		return nil, result.Err()
+	}
+
 	result.Decode(image)
 
 	return image, nil
