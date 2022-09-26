@@ -32,10 +32,10 @@ func NewApi(config *conf.GlobalConfiguration, db *storage.Connection) *API {
 	v1_route := api_route.Group("/v1")
 	v1_image_route := v1_route.Group("/images")
 
-	v1_image_route.Post("/", api.AddIMage)
-	v1_image_route.Get("/", api.GetImagesWithPagination)
-	v1_image_route.Get("/:id", api.GetImage)
-	v1_image_route.Delete("/:id", api.DeleteImage)
+	v1_image_route.Post("/", api.AddImageHandler)
+	v1_image_route.Get("/", api.GetImagesHandler)
+	v1_image_route.Get("/:id", api.GetImageHandler)
+	v1_image_route.Delete("/:id", api.DeleteImageHandler)
 
 	app.Use(logger.New())
 	api.handler = app

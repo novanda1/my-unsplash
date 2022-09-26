@@ -31,7 +31,7 @@ func ValidateInsertImageParams(insertImageParams models.InsertImageDTO) []*Error
 	return errors
 }
 
-func (a *API) AddIMage(c *fiber.Ctx) error {
+func (a *API) AddImageHandler(c *fiber.Ctx) error {
 	c.Accepts("application/json")
 
 	var resp Response
@@ -66,7 +66,7 @@ func (a *API) AddIMage(c *fiber.Ctx) error {
 	return c.JSON(resp)
 }
 
-func (a *API) GetImagesWithPagination(c *fiber.Ctx) error {
+func (a *API) GetImagesHandler(c *fiber.Ctx) error {
 	var resp Response
 
 	params := &models.GetImageDTO{Limit: 25, Cursor: ""}
@@ -89,7 +89,7 @@ func (a *API) GetImagesWithPagination(c *fiber.Ctx) error {
 	return c.JSON(resp)
 }
 
-func (a *API) GetImage(c *fiber.Ctx) error {
+func (a *API) GetImageHandler(c *fiber.Ctx) error {
 	var resp Response
 
 	id := c.Params("id")
@@ -109,7 +109,7 @@ func (a *API) GetImage(c *fiber.Ctx) error {
 	return c.JSON(resp)
 }
 
-func (a *API) DeleteImage(c *fiber.Ctx) error {
+func (a *API) DeleteImageHandler(c *fiber.Ctx) error {
 	var resp Response
 
 	id := c.Params("id")
