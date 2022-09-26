@@ -1,8 +1,6 @@
 package api
 
 import (
-	"fmt"
-
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/novanda1/my-unsplash/models"
@@ -34,121 +32,70 @@ func ValidateInsertImageParams(insertImageParams models.InsertImageDTO) []*Error
 func (a *API) AddImageHandler(c *fiber.Ctx) error {
 	c.Accepts("application/json")
 
-	var resp Response
-
 	params := new(models.InsertImageDTO)
 	if err := c.BodyParser(params); err != nil {
-		return err
+		return BadRequestError(c, err.Error(), nil)
 	}
 
 	errors := ValidateInsertImageParams(*params)
 	if errors != nil {
-		resp.Status = "error"
-		resp.Data = errors
-		resp.Message = "body error"
-
-		return c.Status(fiber.StatusBadRequest).JSON(resp)
+		return BadRequestError(c, "body error", errors)
 	}
 
 	result, err := models.SaveImage(a.db, params)
 	if err != nil {
-		resp.Status = "error"
-		resp.Data = result
-		resp.Message = fmt.Sprintf("save image error: %s", err.Error())
-
-		return c.JSON(resp)
+		return InternalServerError(c, err.Error(), result)
 	}
 
-	resp.Status = "success"
-	resp.Data = result
-	resp.Message = "Succesfully added new image!"
-
-	return c.JSON(resp)
+	return SendCreated(c, "Succesfully added new image!", result)
 }
 
 func (a *API) GetImagesHandler(c *fiber.Ctx) error {
-	var resp Response
-
 	params := &models.GetImageDTO{Limit: 25, Cursor: ""}
 	if err := c.QueryParser(params); err != nil {
-		return err
+		return BadRequestError(c, err.Error(), nil)
 	}
 
 	result, err := models.GetImages(a.db, params)
 	if err != nil {
-		resp.Status = "error"
-		resp.Data = result
-		resp.Message = fmt.Sprintf("get image error: %s", err.Error())
-
-		return c.JSON(resp)
+		return InternalServerError(c, err.Error(), nil)
 	}
 
-	resp.Status = "success"
-	resp.Data = result
-
-	return c.JSON(resp)
+	return SendOK(c, "", result)
 }
 
 func (a *API) GetImageHandler(c *fiber.Ctx) error {
-	var resp Response
-
 	id := c.Params("id")
 
 	image, err := models.GetImage(a.db, id)
 	if err != nil {
-		resp.Status = "error"
-		resp.Data = image
-		resp.Message = fmt.Sprintf("get image error: %s", err.Error())
-
-		return c.JSON(resp)
+		return InternalServerError(c, err.Error(), nil)
 	}
 
-	resp.Status = "success"
-	resp.Data = image
-
-	return c.JSON(resp)
+	return SendOK(c, "", image)
 }
 
 func (a *API) DeleteImageHandler(c *fiber.Ctx) error {
-	var resp Response
-
 	id := c.Params("id")
 
 	image, err := models.DeleteImage(a.db, id)
 	if err != nil {
-		resp.Status = "error"
-		resp.Data = image
-		resp.Message = fmt.Sprintf("get image error: %s", err.Error())
-
-		return c.JSON(resp)
+		return BadRequestError(c, err.Error(), nil)
 	}
 
-	resp.Status = "success"
-	resp.Data = image
-	resp.Message = "Successfully deleted image!"
-
-	return c.JSON(resp)
+	return SendOK(c, "Successfully deleted image!", image)
 }
 
 func (a *API) SearchImageHandler(c *fiber.Ctx) error {
-	var resp Response
-
 	params := &models.SearchImageDTO{Limit: 25, Cursor: ""}
 	if err := c.QueryParser(params); err != nil {
-		return err
+		return BadRequestError(c, err.Error(), nil)
 	}
 
 	result, err := models.Search(a.db, params)
 	if err != nil {
-		resp.Status = "error"
-		resp.Data = result
-		resp.Message = fmt.Sprintf("search image error: %s", err.Error())
-
-		return c.JSON(resp)
+		return InternalServerError(c, err.Error(), nil)
 	}
 
-	resp.Status = "success"
-	resp.Data = result
-
-	return c.JSON(resp)
+	return SendOK(c, "", result)
 }
