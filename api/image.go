@@ -33,7 +33,6 @@ func ValidateInsertImageParams(insertImageParams models.InsertImageDTO) []*Error
 
 func (a *API) AddIMage(c *fiber.Ctx) error {
 	c.Accepts("application/json")
-	ctx := c.Context()
 
 	var resp Response
 
@@ -51,7 +50,7 @@ func (a *API) AddIMage(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(resp)
 	}
 
-	result, err := models.SaveImage(ctx, a.db, params)
+	result, err := models.SaveImage(a.db, params)
 	if err != nil {
 		resp.Status = "error"
 		resp.Data = result
@@ -63,6 +62,29 @@ func (a *API) AddIMage(c *fiber.Ctx) error {
 	resp.Status = "success"
 	resp.Data = result
 	resp.Message = "Succesfully added new image!"
+
+	return c.JSON(resp)
+}
+
+func (a *API) GetImagesWithPagination(c *fiber.Ctx) error {
+	var resp Response
+
+	params := &models.GetImageDTO{Limit: 25, Cursor: ""}
+	if err := c.QueryParser(params); err != nil {
+		return err
+	}
+
+	result, err := models.GetImages(a.db, params)
+	if err != nil {
+		resp.Status = "error"
+		resp.Data = result
+		resp.Message = fmt.Sprintf("get image error: %s", err.Error())
+
+		return c.JSON(resp)
+	}
+
+	resp.Status = "success"
+	resp.Data = result
 
 	return c.JSON(resp)
 }

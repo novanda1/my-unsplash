@@ -33,6 +33,7 @@ func NewApi(config *conf.GlobalConfiguration, db *storage.Connection) *API {
 	v1_image_route := v1_route.Group("/images")
 
 	v1_image_route.Post("/", api.AddIMage)
+	v1_image_route.Get("/", api.GetImagesWithPagination)
 
 	app.Use(logger.New())
 	api.handler = app
