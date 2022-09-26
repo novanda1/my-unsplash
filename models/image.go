@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/novanda1/my-unsplash/storage"
 	"go.mongodb.org/mongo-driver/bson"
@@ -11,9 +12,10 @@ import (
 )
 
 type Image struct {
-	ID    primitive.ObjectID `bson:"_id,omitempty"`
-	Label string             `bson:"label,omitempty"`
-	Url   string             `bson:"url,omitempty"`
+	ID        primitive.ObjectID `bson:"_id,omitempty"`
+	Label     string             `bson:"label,omitempty"`
+	Url       string             `bson:"url,omitempty"`
+	CreatedAt int64              `json:"created_at"`
 }
 
 type InsertImageDTO struct {
@@ -23,8 +25,9 @@ type InsertImageDTO struct {
 
 func SaveImage(ctx context.Context, storage *storage.Connection, p *InsertImageDTO) (*mongo.InsertOneResult, error) {
 	image := Image{
-		Label: p.Label,
-		Url:   p.Url,
+		Label:     p.Label,
+		Url:       p.Url,
+		CreatedAt: time.Now().Unix(),
 	}
 
 	result, err := storage.ImageCollection().InsertOne(ctx, image)
