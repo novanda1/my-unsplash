@@ -129,3 +129,26 @@ func (a *API) DeleteImageHandler(c *fiber.Ctx) error {
 
 	return c.JSON(resp)
 }
+
+func (a *API) SearchImageHandler(c *fiber.Ctx) error {
+	var resp Response
+
+	params := &models.SearchImageDTO{Limit: 25, Cursor: ""}
+	if err := c.QueryParser(params); err != nil {
+		return err
+	}
+
+	result, err := models.Search(a.db, params)
+	if err != nil {
+		resp.Status = "error"
+		resp.Data = result
+		resp.Message = fmt.Sprintf("search image error: %s", err.Error())
+
+		return c.JSON(resp)
+	}
+
+	resp.Status = "success"
+	resp.Data = result
+
+	return c.JSON(resp)
+}

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/novanda1/my-unsplash/storage"
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -29,6 +30,12 @@ type InsertImageDTO struct {
 type GetImageDTO struct {
 	Cursor string `query:"cursor"`
 	Limit  int64  `query:"limit"`
+}
+
+type SearchImageDTO struct {
+	Cursor string `query:"cursor"`
+	Limit  int64  `query:"limit"`
+	Search string `query:"search"`
 }
 
 func SaveImage(storage *storage.Connection, p *InsertImageDTO) (*mongo.InsertOneResult, error) {
@@ -522,4 +529,44 @@ func Seed(storage *storage.Connection) error {
 	fmt.Print(result.InsertedIDs...)
 
 	return nil
+}
+
+func CreateIndex(storage *storage.Connection) error {
+	model := mongo.IndexModel{Keys: bson.D{{"label", "text"}}}
+	_, err := storage.ImageCollection().Indexes().CreateOne(context.TODO(), model)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func Search(storage *storage.Connection, p *SearchImageDTO) ([]Image, error) {
+	ctx := context.Background()
+	images := make([]Image, 0)
+
+	err := CreateIndex(storage)
+	if err != nil {
+		return nil, err
+	}
+
+	opts := options.FindOptions{Limit: &p.Limit}
+	filter := bson.M{
+		"$text": bson.D{{Key: "$search", Value: p.Search}},
+	}
+	cursor, err := storage.ImageCollection().Find(context.TODO(), filter, &opts)
+	if err != nil {
+		return nil, err
+	}
+
+	for cursor.Next(ctx) {
+		var image Image
+		if err := cursor.Decode(&image); err != nil {
+			logrus.Println(err)
+		}
+
+		images = append(images, image)
+	}
+
+	return images, nil
 }

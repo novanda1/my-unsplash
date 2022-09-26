@@ -34,6 +34,7 @@ func NewApi(config *conf.GlobalConfiguration, db *storage.Connection) *API {
 
 	v1_image_route.Post("/", api.AddImageHandler)
 	v1_image_route.Get("/", api.GetImagesHandler)
+	v1_image_route.Get("/search", api.SearchImageHandler)
 	v1_image_route.Get("/:id", api.GetImageHandler)
 	v1_image_route.Delete("/:id", api.DeleteImageHandler)
 
