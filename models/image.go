@@ -32,7 +32,7 @@ func SaveImage(ctx context.Context, storage *storage.Connection, p *InsertImageD
 		return nil, err
 	}
 
-	return result, bson.ErrDecodeToNil
+	return result, nil
 }
 
 func DeleteImage(ctx context.Context, storage *storage.Connection, id string) error {

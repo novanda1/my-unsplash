@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"time"
 
 	"github.com/novanda1/my-unsplash/api"
 	"github.com/novanda1/my-unsplash/conf"
@@ -20,6 +22,9 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("error opening database: %+v", err)
 	}
+
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	defer db.Client.Disconnect(ctx)
 
 	api := api.NewApi(config, db)
 

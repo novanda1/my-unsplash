@@ -30,12 +30,11 @@ func Dial(config *conf.GlobalConfiguration) (*Connection, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer client.Disconnect(ctx)
 
 	if err := client.Ping(context.TODO(), readpref.Primary()); err != nil {
 		panic(err)
 	}
-	fmt.Println("Successfully connected and pinged.")
+	fmt.Println("Mongo DB: Successfully connected and pinged.")
 
 	return &Connection{client}, nil
 }
