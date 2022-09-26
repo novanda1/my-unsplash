@@ -47,22 +47,24 @@ func SaveImage(storage *storage.Connection, p *InsertImageDTO) (*mongo.InsertOne
 	return result, nil
 }
 
-func DeleteImage(ctx context.Context, storage *storage.Connection, id string) error {
-	idPrimitive, err := primitive.ObjectIDFromHex(id)
+func DeleteImage(storage *storage.Connection, id string) (bool, error) {
+	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return err
+		return false, err
 	}
 
-	result, err := storage.ImageCollection().DeleteOne(ctx, bson.M{"_id": idPrimitive})
+	ctx := context.Background()
+
+	result, err := storage.ImageCollection().DeleteOne(ctx, bson.M{"_id": objectId})
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	if result.DeletedCount == 0 {
-		return errors.New("object not found")
+		return false, errors.New("No image found")
 	}
 
-	return nil
+	return true, nil
 }
 
 func GetImages(storage *storage.Connection, p *GetImageDTO) ([]Image, error) {

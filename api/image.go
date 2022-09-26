@@ -108,3 +108,24 @@ func (a *API) GetImage(c *fiber.Ctx) error {
 
 	return c.JSON(resp)
 }
+
+func (a *API) DeleteImage(c *fiber.Ctx) error {
+	var resp Response
+
+	id := c.Params("id")
+
+	image, err := models.DeleteImage(a.db, id)
+	if err != nil {
+		resp.Status = "error"
+		resp.Data = image
+		resp.Message = fmt.Sprintf("get image error: %s", err.Error())
+
+		return c.JSON(resp)
+	}
+
+	resp.Status = "success"
+	resp.Data = image
+	resp.Message = "Successfully deleted image!"
+
+	return c.JSON(resp)
+}
