@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/novanda1/my-unsplash/conf"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 
 	"github.com/pkg/errors"
 )
@@ -32,11 +32,18 @@ func Dial(config *conf.GlobalConfiguration) (*Connection, error) {
 	}
 	defer client.Disconnect(ctx)
 
-	databases, err := client.ListDatabaseNames(ctx, bson.M{})
-	if err != nil {
-		log.Fatal(err)
+	if err := client.Ping(context.TODO(), readpref.Primary()); err != nil {
+		panic(err)
 	}
-	fmt.Printf("database are %v", databases)
+	fmt.Println("Successfully connected and pinged.")
 
 	return &Connection{client}, nil
+}
+
+func (c *Connection) UnsplashDatabase() *mongo.Database {
+	return c.Client.Database("unsplash")
+}
+
+func (c *Connection) ImageCollection() *mongo.Collection {
+	return c.UnsplashDatabase().Collection("images")
 }
