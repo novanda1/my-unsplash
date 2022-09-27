@@ -29,6 +29,11 @@ func NewApi(config *conf.GlobalConfiguration, db *storage.Connection) *API {
 	api.db = db
 
 	app := fiber.New()
+	app.Use(logger.New())
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "*",
+	}))
+
 	api_route := app.Group("/api")
 	v1_route := api_route.Group("/v1")
 	v1_image_route := v1_route.Group("/images")
@@ -38,12 +43,6 @@ func NewApi(config *conf.GlobalConfiguration, db *storage.Connection) *API {
 	v1_image_route.Get("/search", api.SearchImageHandler)
 	v1_image_route.Get("/:id", api.GetImageHandler)
 	v1_image_route.Delete("/:id", api.DeleteImageHandler)
-
-	app.Use(logger.New())
-	app.Use(cors.New(cors.Config{
-		AllowOrigins: config.API.ExternalURL,
-		AllowHeaders: "Origin, Content-Type, Accept",
-	}))
 
 	api.handler = app
 

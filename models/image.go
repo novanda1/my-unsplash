@@ -38,7 +38,7 @@ type SearchImageDTO struct {
 	Search string `query:"search"`
 }
 
-func SaveImage(storage *storage.Connection, p *InsertImageDTO) (*mongo.InsertOneResult, error) {
+func SaveImage(storage *storage.Connection, p *InsertImageDTO) (*Image, error) {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
 	image := Image{
@@ -52,7 +52,14 @@ func SaveImage(storage *storage.Connection, p *InsertImageDTO) (*mongo.InsertOne
 		return nil, err
 	}
 
-	return result, nil
+	oid, ok := result.InsertedID.(primitive.ObjectID)
+	if ok != true {
+		return nil, errors.New("not valid id")
+	}
+
+	image.ID = oid
+
+	return &image, nil
 }
 
 func DeleteImage(storage *storage.Connection, id string) (bool, error) {
