@@ -24,7 +24,7 @@ export type GetImagesDTO = {
 };
 
 export type SearchImagesDTO = {
-  query: string;
+  search: string;
 } & GetImagesDTO;
 
 export class API {
