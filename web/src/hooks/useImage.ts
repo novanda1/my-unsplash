@@ -81,7 +81,12 @@ export const useDelete = () => {
         ["/search", { search: "", limit: 9 }],
         api.deleteImage(id),
         {
-          populateCache: (_, current: ImageResponse<TImage[]>) => {
+          populateCache: (
+            res: ImageResponse<boolean>,
+            current: ImageResponse<TImage[]>
+          ) => {
+            if (!res.data) current; // failed to delete
+
             const newData = produce(current.data, (draft) => {
               const index = draft.findIndex((d) => d.id === id);
               if (index !== -1) draft.splice(index, 1);
