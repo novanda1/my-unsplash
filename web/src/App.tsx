@@ -3,13 +3,7 @@ import { createContext, useState } from "react";
 import Images from "./components/Images";
 import Navigation from "./components/Navigation";
 import { dummy } from "./dummy";
-
-export type TImage = {
-  id: string;
-  label: string;
-  url: string;
-  createdAt: number;
-};
+import { TImage } from "./lib/api";
 
 export interface IAppContext {
   data: TImage[];
