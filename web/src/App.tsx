@@ -1,12 +1,13 @@
-import { Box } from "@chakra-ui/react";
+import { Box, Container } from "@chakra-ui/react";
 import { createContext, useState } from "react";
 import Images from "./components/Images";
 import Navigation from "./components/Navigation";
 import { dummy } from "./dummy";
+import { useSearch } from "./hooks/useImage";
 import { TImage } from "./lib/api";
 
 export interface IAppContext {
-  data: TImage[];
+  data?: TImage[];
   handleChangeData: (q: string) => void;
 }
 
@@ -18,21 +19,28 @@ export const AppContext = createContext<IAppContext>({
 export const AppContextProvider = AppContext.Provider;
 
 function App() {
-  const [data, setData] = useState(dummy);
+  const [search, setSearch] = useState("");
+
+  const { images, isError, isLoading } = useSearch({ search, limit: 9 });
 
   const handleChangeData = (q: string) => {
-    const filter = dummy.filter(({ label }) =>
-      label.toLowerCase().includes(q.toLowerCase())
-    );
-
-    setData(filter);
+    if (q.length >= 3 || !q.length) setSearch(q.toLowerCase());
   };
 
   return (
     <Box>
-      <AppContextProvider value={{ data, handleChangeData }}>
+      <AppContextProvider value={{ data: images?.data, handleChangeData }}>
         <Navigation />
-        <Images />
+
+        <Container maxW="container.xl" pb={50}>
+          {isLoading ? (
+            "Loading..."
+          ) : isError ? (
+            "Something went wrong..."
+          ) : (
+            <Images />
+          )}
+        </Container>
       </AppContextProvider>
     </Box>
   );

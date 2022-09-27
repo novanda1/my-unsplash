@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Container,
   Image,
   Input,
   InputGroup,
@@ -14,11 +13,12 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { Formik } from "formik";
-import { useCallback, useContext, useRef, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 
 import * as Yup from "yup";
-import { AppContext, TImage } from "../App";
+import { AppContext } from "../App";
+import { TImage } from "../lib/api";
 
 const DeleteImageModal: React.FC<{
   id: string;
@@ -166,15 +166,13 @@ const Images: React.FC = () => {
   const { data } = useContext(AppContext);
 
   return (
-    <Container maxW="container.xl" pb={50}>
-      <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}>
-        <Masonry gutter="45px">
-          {data.map((img) => (
-            <ImageItem key={img.id} img={img} />
-          ))}
-        </Masonry>
-      </ResponsiveMasonry>
-    </Container>
+    <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}>
+      <Masonry gutter="45px">
+        {data?.map((img) => (
+          <ImageItem key={img.id} img={img} />
+        ))}
+      </Masonry>
+    </ResponsiveMasonry>
   );
 };
 
