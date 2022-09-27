@@ -83,7 +83,7 @@ export const useDelete = () => {
         {
           populateCache: (_, current: ImageResponse<TImage[]>) => {
             const newData = produce(current.data, (draft) => {
-              const index = draft.findIndex((d) => d.id === d.id);
+              const index = draft.findIndex((d) => d.id === id);
               if (index !== -1) draft.splice(index, 1);
             });
 
