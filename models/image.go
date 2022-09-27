@@ -562,9 +562,13 @@ func Search(storage *storage.Connection, p *SearchImageDTO) ([]Image, error) {
 	}
 
 	opts := options.FindOptions{Limit: &p.Limit}
-	filter := bson.M{
-		"$text": bson.D{{Key: "$search", Value: p.Search}},
+	var filter bson.M
+	if p.Search != "" {
+		filter = bson.M{
+			"$text": bson.D{{Key: "$search", Value: p.Search}},
+		}
 	}
+
 	cursor, err := storage.ImageCollection().Find(context.TODO(), filter, &opts)
 	if err != nil {
 		return nil, err
