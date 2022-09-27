@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/novanda1/my-unsplash/conf"
 	"github.com/novanda1/my-unsplash/storage"
@@ -39,6 +40,11 @@ func NewApi(config *conf.GlobalConfiguration, db *storage.Connection) *API {
 	v1_image_route.Delete("/:id", api.DeleteImageHandler)
 
 	app.Use(logger.New())
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: config.API.ExternalURL,
+		AllowHeaders: "Origin, Content-Type, Accept",
+	}))
+
 	api.handler = app
 
 	return api
