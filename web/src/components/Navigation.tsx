@@ -11,13 +11,22 @@ import {
   ModalContent,
   ModalOverlay,
 } from "@chakra-ui/react";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useContext, useState } from "react";
+import { AppContext } from "../App";
 import AddImageForm from "./AddImageForm";
 
 import Logo from "./Logo";
 
 const Navigation: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [query, setQuery] = useState("");
+
+  const { handleChangeData } = useContext(AppContext);
+
+  const handleQueryChange = (e: any) => {
+    setQuery(e.target.value);
+    handleChangeData(e.target.value);
+  };
 
   const openModal = useCallback(() => {
     setIsOpen(true);
@@ -39,7 +48,12 @@ const Navigation: React.FC = () => {
                   pointerEvents="none"
                   children={<Search2Icon color="gray.300" />}
                 />
-                <Input type="text" placeholder="Search by name" />
+                <Input
+                  type="text"
+                  placeholder="Search by name"
+                  value={query}
+                  onChange={handleQueryChange}
+                />
               </InputGroup>
             </HStack>
             <Button colorScheme="green" fontSize={14} onClick={openModal}>

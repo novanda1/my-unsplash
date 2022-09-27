@@ -1,12 +1,45 @@
 import { Box } from "@chakra-ui/react";
+import { createContext, useState } from "react";
 import Images from "./components/Images";
 import Navigation from "./components/Navigation";
+import { dummy } from "./dummy";
+
+export type TImage = {
+  id: string;
+  label: string;
+  url: string;
+  createdAt: number;
+};
+
+export interface IAppContext {
+  data: TImage[];
+  handleChangeData: (q: string) => void;
+}
+
+export const AppContext = createContext<IAppContext>({
+  data: [],
+  handleChangeData: () => {},
+});
+
+export const AppContextProvider = AppContext.Provider;
 
 function App() {
+  const [data, setData] = useState(dummy);
+
+  const handleChangeData = (q: string) => {
+    const filter = dummy.filter(({ label }) =>
+      label.toLowerCase().includes(q.toLowerCase())
+    );
+
+    setData(filter);
+  };
+
   return (
     <Box>
-      <Navigation />
-      <Images />
+      <AppContextProvider value={{ data, handleChangeData }}>
+        <Navigation />
+        <Images />
+      </AppContextProvider>
     </Box>
   );
 }
