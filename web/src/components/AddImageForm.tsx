@@ -10,6 +10,7 @@ import {
 import { Formik } from "formik";
 
 import * as Yup from "yup";
+import { useSaveImage } from "../hooks/useImage";
 
 const AddImageForm: React.FC<{ handleClose: () => void }> = ({
   handleClose,
@@ -19,6 +20,8 @@ const AddImageForm: React.FC<{ handleClose: () => void }> = ({
     url: Yup.string().required().url().label("Photo URL"),
   });
 
+  const { handleSave } = useSaveImage();
+
   return (
     <Box>
       <Heading as="h3" mb="20px" fontWeight={500} fontSize={24}>
@@ -27,12 +30,11 @@ const AddImageForm: React.FC<{ handleClose: () => void }> = ({
       <Formik
         initialValues={{ url: "", label: "" }}
         validationSchema={imageSchema}
-        onSubmit={(values, actions) => {
-          setTimeout(() => {
-            alert(JSON.stringify(values, null, 2));
-            actions.setSubmitting(false);
-            handleClose()
-          }, 1000);
+        onSubmit={async (values, actions) => {
+          actions.setSubmitting(true);
+          await handleSave(values);
+          actions.setSubmitting(false);
+          handleClose();
         }}
       >
         {({
@@ -92,7 +94,11 @@ const AddImageForm: React.FC<{ handleClose: () => void }> = ({
               <Button type="button" variant="ghost" onClick={handleClose}>
                 Cancel
               </Button>
-              <Button type="submit" colorScheme="green" isLoading={isSubmitting}>
+              <Button
+                type="submit"
+                colorScheme="green"
+                isLoading={isSubmitting}
+              >
                 Submit
               </Button>
             </HStack>

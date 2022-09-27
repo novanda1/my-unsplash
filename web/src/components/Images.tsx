@@ -18,6 +18,7 @@ import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 
 import * as Yup from "yup";
 import { AppContext } from "../App";
+import { useDelete } from "../hooks/useImage";
 import { TImage } from "../lib/api";
 
 const DeleteImageModal: React.FC<{
@@ -29,6 +30,8 @@ const DeleteImageModal: React.FC<{
     pw: Yup.string().required().min(6).label("Password"),
   });
 
+  const { handleDelete } = useDelete();
+
   return (
     <Modal isOpen={isOpen} onClose={handleClose}>
       <ModalOverlay />
@@ -36,14 +39,11 @@ const DeleteImageModal: React.FC<{
         <Formik
           initialValues={{ pw: "" }}
           validationSchema={pwSchema}
-          onSubmit={(values, actions) => {
-            console.log("delete image id:", id);
-
-            setTimeout(() => {
-              alert(JSON.stringify(values, null, 2));
-              actions.setSubmitting(false);
-              handleClose();
-            }, 1000);
+          onSubmit={async (_, actions) => {
+            actions.setSubmitting(true);
+            await handleDelete(id);
+            actions.setSubmitting(false);
+            handleClose();
           }}
         >
           {({

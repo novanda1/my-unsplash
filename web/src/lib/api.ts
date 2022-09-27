@@ -31,7 +31,10 @@ export class API {
   private baseurl: string = import.meta.env.VITE_API_URL;
 
   public async request(endpoint: string, init?: RequestInit) {
-    return fetch(this.baseurl + "/api/v1" + endpoint, init).then((r) =>
+    const headers = new Headers();
+    headers.append("Content-Type", "application/json");
+
+    return fetch(this.baseurl + "/api/v1" + endpoint, {...init, headers}).then((r) =>
       r.json()
     );
   }
