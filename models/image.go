@@ -92,7 +92,7 @@ func GetImages(storage *storage.Connection, p *GetImageDTO) ([]Image, error) {
 		lastIdPrimitive = lastId
 	}
 
-	opts := options.FindOptions{Limit: &p.Limit}
+	opts := options.FindOptions{Limit: &p.Limit, Sort: bson.M{"createdat": -1}}
 	filter := bson.M{
 		"_id": bson.D{{Key: "$gt", Value: lastIdPrimitive}},
 	}
@@ -561,7 +561,7 @@ func Search(storage *storage.Connection, p *SearchImageDTO) ([]Image, error) {
 		return nil, err
 	}
 
-	opts := options.FindOptions{Limit: &p.Limit}
+	opts := options.FindOptions{Limit: &p.Limit, Sort: bson.M{"createdat": -1}}
 	var filter bson.M
 	if p.Search != "" {
 		filter = bson.M{
