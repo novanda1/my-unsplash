@@ -142,6 +142,7 @@ const ImageItem: React.FC<{ img: TImage }> = ({
       _hover={{
         ".hover-content": {
           opacity: 1,
+          zIndex: 1
         },
       }}
     >
