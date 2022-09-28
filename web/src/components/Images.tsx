@@ -184,10 +184,14 @@ const ImageItem: React.FC<{ img: TImage }> = ({
         layout="responsive"
         width={img.w}
         height={img.h}
-        onLoad={() => setOpacity(0)}
+        onLoadingComplete={() => setOpacity(0)}
       />
 
-      <Box position="absolute" inset={0} opacity={opacity}>
+      <Box
+        position="absolute"
+        inset={0}
+        opacity={opacity}
+      >
         <Blurhash
           hash={img.hash}
           width={"100%"}
