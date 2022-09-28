@@ -12,13 +12,19 @@ import {
 
 const api = new ImageAPI();
 
+export type UseImage = {
+  response: ImageResponse<TImage[]> | undefined;
+  isLoading: boolean;
+  isError: any;
+};
+
 export const useImages = (key: GetImagesDTO) => {
   const { data, error } = useSWR(["/images", key], (...args) =>
     api.getImages(args[1])
   );
 
   return {
-    images: data,
+    response: data,
     isLoading: !error && !data,
     isError: error,
   };
@@ -29,10 +35,8 @@ export const useSearch = (key: SearchImagesDTO) => {
     api.search(args[1])
   );
 
-  console.log({ data });
-
   return {
-    images: data,
+    response: data,
     isLoading: !error && !data,
     isError: error,
   };

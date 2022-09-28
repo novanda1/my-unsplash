@@ -11,13 +11,14 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
+  Container,
 } from "@chakra-ui/react";
 import { Formik } from "formik";
 import { useCallback, useContext, useState } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 
 import * as Yup from "yup";
-import { AppContext } from "../App";
+import { ImagesContext } from "../context/app";
 import { useDelete } from "../hooks/useImage";
 import { TImage } from "../lib/api";
 
@@ -163,16 +164,39 @@ const ImageItem: React.FC<{ img: TImage }> = ({ img }) => {
 };
 
 const Images: React.FC = () => {
-  const { data } = useContext(AppContext);
+  const { images } = useContext(ImagesContext);
+
+  if (images?.isLoading)
+    return (
+      <Container maxW="container.xl" pb={50}>
+        Loading...
+      </Container>
+    );
+
+  if (images?.isError)
+    return (
+      <Container maxW="container.xl" pb={50}>
+        Something went wrong...
+      </Container>
+    );
+
+  if (!images?.isError && !images?.isLoading && !images?.response?.data.length)
+    return (
+      <Container maxW="container.xl" pb={50}>
+        No result...
+      </Container>
+    );
 
   return (
-    <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}>
-      <Masonry gutter="45px">
-        {data?.map((img) => (
-          <ImageItem key={img.id} img={img} />
-        ))}
-      </Masonry>
-    </ResponsiveMasonry>
+    <Container maxW="container.xl" pb={50}>
+      <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}>
+        <Masonry gutter="45px">
+          {images?.response?.data.map((img) => (
+            <ImageItem key={img.id} img={img} />
+          ))}
+        </Masonry>
+      </ResponsiveMasonry>
+    </Container>
   );
 };
 

@@ -28,15 +28,16 @@ export type SearchImagesDTO = {
 } & GetImagesDTO;
 
 export class API {
-  private baseurl: string = import.meta.env.VITE_API_URL;
+  private baseurl: string = process.env.NEXT_PUBLIC_API_URL as string;
 
   public async request(endpoint: string, init?: RequestInit) {
     const headers = new Headers();
     headers.append("Content-Type", "application/json");
 
-    return fetch(this.baseurl + "/api/v1" + endpoint, {...init, headers}).then((r) =>
-      r.json()
-    );
+    return fetch(this.baseurl + "/api/v1" + endpoint, {
+      ...init,
+      headers,
+    }).then((r) => r.json());
   }
 }
 

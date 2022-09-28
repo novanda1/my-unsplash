@@ -12,7 +12,7 @@ import {
   ModalOverlay,
 } from "@chakra-ui/react";
 import React, { useCallback, useContext, useState } from "react";
-import { AppContext } from "../App";
+import { ImagesContext } from "../context/app";
 import AddImageForm from "./AddImageForm";
 
 import Logo from "./Logo";
@@ -21,7 +21,7 @@ const Navigation: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
 
-  const { handleChangeData } = useContext(AppContext);
+  const { handleChangeData } = useContext(ImagesContext);
 
   const handleQueryChange = (e: any) => {
     setQuery(e.target.value);
