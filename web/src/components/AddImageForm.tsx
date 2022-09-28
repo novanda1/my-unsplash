@@ -10,7 +10,7 @@ import {
 import { Formik } from "formik";
 
 import * as Yup from "yup";
-import { useSaveImage } from "../hooks/useImage";
+import { useHash, useSaveImage } from "../hooks/useImage";
 
 const AddImageForm: React.FC<{ handleClose: () => void }> = ({
   handleClose,
@@ -21,6 +21,7 @@ const AddImageForm: React.FC<{ handleClose: () => void }> = ({
   });
 
   const { handleSave } = useSaveImage();
+  const { hash } = useHash()
 
   return (
     <Box>
@@ -32,7 +33,13 @@ const AddImageForm: React.FC<{ handleClose: () => void }> = ({
         validationSchema={imageSchema}
         onSubmit={async (values, actions) => {
           actions.setSubmitting(true);
-          await handleSave(values);
+          const hashRes = await hash(values.url)
+          const w = hashRes.img?.width
+          const h = hashRes.img?.height
+          const hashString = hashRes.blurhash?.hash
+
+          await handleSave({...values, h, w, hash: hashString});
+
           actions.setSubmitting(false);
           handleClose();
         }}

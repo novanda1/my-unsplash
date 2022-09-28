@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Image,
   Input,
   InputGroup,
   Modal,
@@ -14,8 +13,16 @@ import {
   Container,
 } from "@chakra-ui/react";
 import { Formik } from "formik";
-import { useCallback, useContext, useState } from "react";
-import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
+import {
+  useCallback,
+  useContext,
+  useState,
+} from "react";
+import Masonry, {
+  ResponsiveMasonry,
+} from "react-responsive-masonry";
+import { Blurhash } from "react-blurhash";
+import Image from "next/image";
 
 import * as Yup from "yup";
 import { ImagesContext } from "../context/app";
@@ -28,7 +35,10 @@ const DeleteImageModal: React.FC<{
   handleClose: () => void;
 }> = ({ id, isOpen, handleClose }) => {
   let pwSchema = Yup.object({
-    pw: Yup.string().required().min(6).label("Password"),
+    pw: Yup.string()
+      .required()
+      .min(6)
+      .label("Password"),
   });
 
   const { handleDelete } = useDelete();
@@ -56,7 +66,9 @@ const DeleteImageModal: React.FC<{
             isSubmitting,
           }) => (
             <form onSubmit={handleSubmit}>
-              <ModalHeader>Are you sure?</ModalHeader>
+              <ModalHeader>
+                Are you sure?
+              </ModalHeader>
               <ModalBody>
                 <InputGroup mb="18px">
                   <Box as="label" w="100%">
@@ -72,7 +84,10 @@ const DeleteImageModal: React.FC<{
                     />
                     <Box mt={1}>
                       {errors.pw && touched.pw && (
-                        <Text fontSize={14} color="red.600">
+                        <Text
+                          fontSize={14}
+                          color="red.600"
+                        >
                           {errors.pw}
                         </Text>
                       )}
@@ -105,8 +120,11 @@ const DeleteImageModal: React.FC<{
   );
 };
 
-const ImageItem: React.FC<{ img: TImage }> = ({ img }) => {
+const ImageItem: React.FC<{ img: TImage }> = ({
+  img,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [opacity, setOpacity] = useState(1);
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
@@ -152,13 +170,36 @@ const ImageItem: React.FC<{ img: TImage }> = ({ img }) => {
         opacity={0}
         bgGradient="linear(to-b, transparent 0%, gray.600 200%)"
       >
-        <Text color="white" fontSize={18} fontWeight={700}>
+        <Text
+          color="white"
+          fontSize={18}
+          fontWeight={700}
+        >
           {img.label}
         </Text>
       </Box>
-      <Image src={img.url} />
+      <Image
+        src={img.url}
+        alt=""
+        layout="responsive"
+        width={img.w}
+        height={img.h}
+        onLoad={() => setOpacity(0)}
+      />
 
-      <DeleteImageModal id={img.id} handleClose={handleClose} isOpen={isOpen} />
+      <Box position="absolute" inset={0} opacity={opacity}>
+        <Blurhash
+          hash={img.hash}
+          width={"100%"}
+          height={"100%"}
+        />
+      </Box>
+
+      <DeleteImageModal
+        id={img.id}
+        handleClose={handleClose}
+        isOpen={isOpen}
+      />
     </Box>
   );
 };
@@ -180,7 +221,11 @@ const Images: React.FC = () => {
       </Container>
     );
 
-  if (!images?.isError && !images?.isLoading && !images?.response?.data.length)
+  if (
+    !images?.isError &&
+    !images?.isLoading &&
+    !images?.response?.data.length
+  )
     return (
       <Container maxW="container.xl" pb={50}>
         No result...
@@ -189,7 +234,13 @@ const Images: React.FC = () => {
 
   return (
     <Container maxW="container.xl" pb={50}>
-      <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}>
+      <ResponsiveMasonry
+        columnsCountBreakPoints={{
+          350: 1,
+          750: 2,
+          900: 3,
+        }}
+      >
         <Masonry gutter="45px">
           {images?.response?.data.map((img) => (
             <ImageItem key={img.id} img={img} />

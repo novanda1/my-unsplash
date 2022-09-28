@@ -53,6 +53,8 @@ export const useSaveImage = () => {
             updated: ImageResponse<TImage>,
             current: ImageResponse<TImage[]>
           ) => {
+            if(updated.status !== "success") return current
+
             const newData = produce(current.data, (draft) => {
               draft.splice(-1);
               draft.unshift(updated.data);
@@ -113,3 +115,11 @@ export const useDelete = () => {
 
   return { handleDelete };
 };
+
+export const useHash = () => {
+  const hash = async (url:string) =>{
+    return await api.hash(url)
+  }
+
+  return { hash }
+}

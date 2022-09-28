@@ -19,12 +19,18 @@ type Image struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	Label     string             `bson:"label,omitempty" json:"label"`
 	Url       string             `bson:"url,omitempty" json:"url"`
+	Width     int64              `bson:"w,omitempty" json:"w"`
+	Height    int64              `bson:"h,omitempty" json:"h"`
+	Hash      string             `bson:"hash,omitempty" json:"hash"`
 	CreatedAt int64              `json:"createdAt"`
 }
 
 type InsertImageDTO struct {
-	Label string `json:"label" validate:"required,min=3,max=25"`
-	Url   string `json:"url" validate:"required,min=10"`
+	Label  string `json:"label" validate:"required,min=3,max=25"`
+	Url    string `json:"url" validate:"required,min=10"`
+	Width  int64  `json:"w" validate:"required"`
+	Height int64  `json:"h" validate:"required"`
+	Hash   string `json:"hash" validate:"required"`
 }
 
 type GetImageDTO struct {
@@ -44,6 +50,9 @@ func SaveImage(storage *storage.Connection, p *InsertImageDTO) (*Image, error) {
 	image := Image{
 		Label:     p.Label,
 		Url:       p.Url,
+		Width:     p.Width,
+		Height:    p.Height,
+		Hash:      p.Hash,
 		CreatedAt: time.Now().Unix(),
 	}
 

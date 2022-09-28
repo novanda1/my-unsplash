@@ -1,8 +1,12 @@
+import { IGetPlaiceholderReturn } from "plaiceholder";
 import { EncodedQuery, objectToSearchString } from "serialize-query-params";
 
 export type SaveImageDTO = {
   label: string;
   url: string;
+  hash: string;
+  w: number
+  h: number
 };
 
 export type TImage = {
@@ -10,6 +14,9 @@ export type TImage = {
   label: string;
   url: string;
   createdAt: number;
+  hash: string;
+  w: number;
+  h: number;
 };
 
 export type ImageResponse<T = TImage> = {
@@ -29,6 +36,17 @@ export type SearchImagesDTO = {
 
 export class API {
   private baseurl: string = process.env.NEXT_PUBLIC_API_URL as string;
+  private host: string = process.env.NEXT_PUBLIC_HOST as string;
+
+  public async localRequest(endpoint: string, init?: RequestInit) {
+    const headers = new Headers();
+    headers.append("Content-Type", "application/json");
+
+    return fetch(this.host + "/api" + endpoint, {
+      ...init,
+      headers,
+    }).then((r) => r.json());
+  }
 
   public async request(endpoint: string, init?: RequestInit) {
     const headers = new Headers();
@@ -71,6 +89,13 @@ export class ImageAPI extends API {
       method: "POST",
       body: JSON.stringify(body),
     });
+  }
+
+  public async hash(url: string): Promise<IGetPlaiceholderReturn & {}> {
+    return this.localRequest("/hash", {
+      method: "post",
+      body: JSON.stringify({url})
+    })
   }
 
   public async saveImage(params: SaveImageDTO): Promise<ImageResponse> {
