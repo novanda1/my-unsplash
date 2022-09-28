@@ -56,7 +56,6 @@ export const useSaveImage = () => {
             if(updated.status !== "success") return current
 
             const newData = produce(current.data, (draft) => {
-              draft.splice(-1);
               draft.unshift(updated.data);
             });
 
@@ -103,7 +102,6 @@ export const useDelete = () => {
               data: newData,
             };
           },
-          revalidate: false,
         }
       );
 
