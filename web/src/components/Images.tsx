@@ -28,8 +28,8 @@ const Images: React.FC = () => {
   useEffect(() => {}, [width]);
 
   useEffect(() => {
-    setMutate(images);
-  }, [mutate]);
+    setMutate({ mutate: images.mutate });
+  }, [mutate, images.mutate, setMutate]);
 
   return (
     <Container maxW="container.xl" pb={50}>

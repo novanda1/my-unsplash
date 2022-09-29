@@ -9,7 +9,7 @@ import {
   InputLeftElement,
   Modal,
   ModalContent,
-  ModalOverlay
+  ModalOverlay,
 } from "@chakra-ui/react";
 import React, { useCallback, useContext, useState } from "react";
 import { ImagesContext } from "../context/app";
@@ -52,10 +52,9 @@ const Navigation: React.FC = () => {
               style={{ marginLeft: 0 }}
             >
               <InputGroup w="max-content" flex={[1, "unset"]}>
-                <InputLeftElement
-                  pointerEvents="none"
-                  children={<Search2Icon color="gray.300" />}
-                />
+                <InputLeftElement pointerEvents="none">
+                  <Search2Icon color="gray.300" />
+                </InputLeftElement>
                 <Input
                   type="text"
                   placeholder="Search by name"
