@@ -24,3 +24,24 @@ a {
     background: black;
   }
 }
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.gallery {
+  width: 100%;
+  position: relative;
+}
+
+.imgContainer {
+  width: 30%;
+  margin: 0.5rem;
+  position: absolute;
+}
+
+.imgContainer img {
+  border-radius: 5px;
+}

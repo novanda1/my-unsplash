@@ -1,12 +1,16 @@
 import { Container } from "@chakra-ui/react";
-import { useContext } from "react";
-import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
+import React, { useContext, useEffect } from "react";
+import Masonry from "react-masonry-component";
+import { useWindowSize } from "usehooks-ts";
 
 import { ImagesContext } from "../context/app";
 import ImageItem from "./ImageItem";
 
 const Images: React.FC = () => {
   const { images } = useContext(ImagesContext);
+  const { width } = useWindowSize();
+
+  useEffect(() => {}, [width]);
 
   if (images?.isLoading)
     return (
@@ -31,19 +35,14 @@ const Images: React.FC = () => {
 
   return (
     <Container maxW="container.xl" pb={50}>
-      <ResponsiveMasonry
-        columnsCountBreakPoints={{
-          350: 1,
-          750: 2,
-          900: 3,
-        }}
-      >
-        <Masonry gutter="45px">
-          {images?.response?.data.map((img) => (
-            <ImageItem key={img.id} img={img} />
-          ))}
-        </Masonry>
-      </ResponsiveMasonry>
+      {/* @ts-ignore */}
+      <Masonry className="gallery" elementType={"ul"}>
+        {images?.response?.data.map((img) => (
+          <li className="imgContainer" key={img.id}>
+            <ImageItem img={img} />
+          </li>
+        ))}
+      </Masonry>
     </Container>
   );
 };
