@@ -60,35 +60,24 @@ export const useSearch = (key: SearchImagesDTO) => {
 };
 
 export const useSaveImage = () => {
+  const { mutate: _mutate } = useContext(ImagesContext);
+
   const handleSave = async (param: SaveImageDTO) => {
-    try {
-      const result = await mutate(
-        ["/search", { search: "", limit: 9 }],
-        api.saveImage(param),
-        {
-          populateCache: (
-            updated: ImageResponse<TImage>,
-            current: ImageResponse<TImage[]>
-          ) => {
-            if (updated.status !== "success") return current;
+    if (typeof _mutate.mutate !== "function") return;
 
-            const newData = produce(current.data, (draft) => {
-              draft.unshift(updated.data);
-            });
+    let saveResponse = await api.saveImage(param);
 
-            return {
-              ...current,
-              data: newData,
-            };
-          },
-          revalidate: false,
-        }
-      );
+    if (saveResponse.status === "error") return;
+    (_mutate.mutate as KeyedMutator<ImageResponse<TImage[]>[]>)(
+      (old) => {
+        if (!old?.length) return;
+        const newData = old;
+        newData[0].data.unshift(saveResponse.data);
 
-      return result;
-    } catch (error) {
-      console.log({ error });
-    }
+        return newData;
+      },
+      { revalidate: false }
+    );
   };
 
   return {
