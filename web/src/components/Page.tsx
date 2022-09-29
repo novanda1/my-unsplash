@@ -1,20 +1,18 @@
-import { NextPage } from "next";
 import { Box } from "@chakra-ui/react";
-import { ImagesContextProvider } from "../context/app";
-import Navigation from "./Navigation";
 import { PropsWithChildren, useState } from "react";
-import { useSearch } from "../hooks/useImage";
+import { KeyedMutator } from "swr";
+import { ImagesContextProvider } from "../context/app";
+import { ImageResponse, TImage } from "../lib/api";
+import Navigation from "./Navigation";
 
 const Page: React.FC<PropsWithChildren> = ({ children }) => {
-  const [search, setSearch] = useState("");
-  const data = useSearch({ search, limit: 9 });
-
-  const handleChangeData = (q: string) => {
-    if (q.length >= 3 || !q.length) setSearch(q.toLowerCase());
-  };
+  const [query, setQuery] = useState("");
+  const [mutate, setMutate] = useState<KeyedMutator<
+    ImageResponse<TImage[]>[]
+  > | null>(null);
 
   return (
-    <ImagesContextProvider value={{ handleChangeData, images: data }}>
+    <ImagesContextProvider value={{ query, setQuery, mutate, setMutate }}>
       <Box>
         <Navigation />
         {children}

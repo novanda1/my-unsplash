@@ -9,7 +9,7 @@ import {
   InputLeftElement,
   Modal,
   ModalContent,
-  ModalOverlay,
+  ModalOverlay
 } from "@chakra-ui/react";
 import React, { useCallback, useContext, useState } from "react";
 import { ImagesContext } from "../context/app";
@@ -19,13 +19,11 @@ import Logo from "./Logo";
 
 const Navigation: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [query, setQuery] = useState("");
 
-  const { handleChangeData } = useContext(ImagesContext);
+  const { setQuery, query } = useContext(ImagesContext);
 
   const handleQueryChange = (e: any) => {
     setQuery(e.target.value);
-    handleChangeData(e.target.value);
   };
 
   const openModal = useCallback(() => {
@@ -53,7 +51,7 @@ const Navigation: React.FC = () => {
               w="100%"
               style={{ marginLeft: 0 }}
             >
-              <InputGroup w="max-content" flex={[1,"unset"]}>
+              <InputGroup w="max-content" flex={[1, "unset"]}>
                 <InputLeftElement
                   pointerEvents="none"
                   children={<Search2Icon color="gray.300" />}

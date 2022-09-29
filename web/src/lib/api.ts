@@ -5,8 +5,8 @@ export type SaveImageDTO = {
   label: string;
   url: string;
   hash: string;
-  w: number
-  h: number
+  w: number;
+  h: number;
 };
 
 export type TImage = {
@@ -94,8 +94,8 @@ export class ImageAPI extends API {
   public async hash(url: string): Promise<IGetPlaiceholderReturn & {}> {
     return this.localRequest("/hash", {
       method: "post",
-      body: JSON.stringify({url})
-    })
+      body: JSON.stringify({ url }),
+    });
   }
 
   public async saveImage(params: SaveImageDTO): Promise<ImageResponse> {

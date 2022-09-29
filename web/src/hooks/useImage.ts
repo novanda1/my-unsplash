@@ -1,4 +1,5 @@
-import useSWR, { mutate } from "swr";
+import useSWR, { KeyedMutator, mutate } from "swr";
+import useSWRInfinite from "swr/infinite";
 import { produce } from "immer";
 
 import {
@@ -9,6 +10,8 @@ import {
   SearchImagesDTO,
   TImage,
 } from "../lib/api";
+import { useContext } from "react";
+import { ImagesContext } from "../context/app";
 
 const api = new ImageAPI();
 
@@ -31,14 +34,28 @@ export const useImages = (key: GetImagesDTO) => {
 };
 
 export const useSearch = (key: SearchImagesDTO) => {
-  const { data, error } = useSWR(["/search", key], (...args) =>
-    api.search(args[1])
+  const res = useSWRInfinite(
+    (index, prevPage: ImageResponse<TImage[]>) => {
+      // reached the end
+      if (prevPage && !prevPage.data?.length) return null;
+
+      // first page, we don't have `prevPage`
+      if (index === 0) return ["/search", key];
+
+      // add the cursor to the param
+      const nextCursor =
+        prevPage.data && prevPage.data[prevPage.data.length - 1].id;
+
+      return ["/search", { ...key, cursor: nextCursor }];
+    },
+    (...args) => api.search(args[1])
   );
 
   return {
-    response: data,
-    isLoading: !error && !data,
-    isError: error,
+    ...res,
+    response: res.data,
+    isLoading: !res.error && !res.data,
+    isError: res.error,
   };
 };
 
@@ -53,7 +70,7 @@ export const useSaveImage = () => {
             updated: ImageResponse<TImage>,
             current: ImageResponse<TImage[]>
           ) => {
-            if(updated.status !== "success") return current
+            if (updated.status !== "success") return current;
 
             const newData = produce(current.data, (draft) => {
               draft.unshift(updated.data);
@@ -80,29 +97,28 @@ export const useSaveImage = () => {
 };
 
 export const useDelete = () => {
+  const { mutate } = useContext(ImagesContext);
+
   const handleDelete = async (id: string) => {
+    if (mutate === null) return;
+
+    const deleteReq = await api.deleteImage(id);
+    if (!deleteReq.data) return;
+
     try {
-      const data = await mutate(
-        ["/search", { search: "", limit: 9 }],
-        api.deleteImage(id),
-        {
-          populateCache: (
-            res: ImageResponse<boolean>,
-            current: ImageResponse<TImage[]>
-          ) => {
-            if (!res.data) current; // failed to delete
+      let data;
+      await (mutate.mutate as KeyedMutator<ImageResponse<TImage[]>[]>)(
+        (data) => {
+          const deleted = data?.map((d) => ({
+            ...d,
+            data: d.data.filter((img) => img.id !== id),
+          }));
 
-            const newData = produce(current.data, (draft) => {
-              const index = draft.findIndex((d) => d.id === id);
-              if (index !== -1) draft.splice(index, 1);
-            });
+          data = deleted;
 
-            return {
-              ...current,
-              data: newData,
-            };
-          },
-        }
+          return deleted;
+        },
+        { revalidate: false }
       );
 
       return data;
@@ -115,9 +131,9 @@ export const useDelete = () => {
 };
 
 export const useHash = () => {
-  const hash = async (url:string) =>{
-    return await api.hash(url)
-  }
+  const hash = async (url: string) => {
+    return await api.hash(url);
+  };
 
-  return { hash }
-}
+  return { hash };
+};

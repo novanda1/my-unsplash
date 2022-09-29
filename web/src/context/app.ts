@@ -1,15 +1,19 @@
 import { createContext } from "react";
-import { UseImage } from "../hooks/useImage";
+import { KeyedMutator } from "swr";
 import { ImageResponse, TImage } from "../lib/api";
 
 export interface IImagesContext {
-  images: UseImage | undefined;
-  handleChangeData: (q: string) => void;
+  query: string;
+  setQuery: (q: string) => void;
+  mutate: any | null;
+  setMutate: (q: any | null) => void;
 }
 
 export const ImagesContext = createContext<IImagesContext>({
-  images: undefined,
-  handleChangeData: () => {},
+  query: "",
+  setQuery: (q: string) => {},
+  mutate: null,
+  setMutate: () => {},
 });
 
 export const ImagesContextProvider = ImagesContext.Provider;
