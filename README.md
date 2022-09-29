@@ -89,4 +89,4 @@ Learn by Google
 
 ## Contact
 
-- GitHub [@novanda1](https://{github.com/novanda1})
+- GitHub [@novanda1](https://github.com/novanda1)
