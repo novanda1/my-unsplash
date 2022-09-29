@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { Blurhash } from "react-blurhash";
 import { TImage } from "../lib/api";
 import DeleteImageModal from "./DeleteImageModal";
+import { motion } from "framer-motion";
 
 const ImageItem: React.FC<{ img: TImage }> = ({ img }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,20 +30,30 @@ const ImageItem: React.FC<{ img: TImage }> = ({ img }) => {
         },
       }}
     >
-      <Button
+      <Box
         className="hover-content"
         position="absolute"
-        variant="outline"
+        top={0}
+        right={0}
+        left={0}
+        opacity={0}
+        // bgGradient="linear(to-t, transparent 0%, gray.200 100%)"
+        transition="opacity 300ms ease"
+        h="80%"
+        p={18}
+        textAlign="right"
+      >
+       <Button
+        variant="solid"
         colorScheme="red"
         size="xs"
-        top={18}
-        right={18}
-        opacity={0}
-        rounded="38px"
         onClick={handleOpen}
+        cursor="pointer"
       >
         delete
       </Button>
+      </Box>
+      
       <Box
         className="hover-content"
         position="absolute"
@@ -53,6 +64,7 @@ const ImageItem: React.FC<{ img: TImage }> = ({ img }) => {
         py="24px"
         opacity={0}
         bgGradient="linear(to-b, transparent 0%, gray.600 200%)"
+        transition="opacity 300ms ease"
       >
         <Text color="white" fontSize={18} fontWeight={700}>
           {img.label}

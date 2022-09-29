@@ -58,7 +58,7 @@ const DeleteImageModal: React.FC<{
                       Password
                     </Text>
                     <Input
-                      type="text"
+                      type="password"
                       name="pw"
                       placeholder="******************"
                       onChange={handleChange}
