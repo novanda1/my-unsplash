@@ -21,7 +21,7 @@ const AddImageForm: React.FC<{ handleClose: () => void }> = ({
   });
 
   const { handleSave } = useSaveImage();
-  const { hash } = useHash()
+  const { hash } = useHash();
 
   return (
     <Box>
@@ -33,12 +33,21 @@ const AddImageForm: React.FC<{ handleClose: () => void }> = ({
         validationSchema={imageSchema}
         onSubmit={async (values, actions) => {
           actions.setSubmitting(true);
-          const hashRes = await hash(values.url)
-          const w = hashRes.img?.width
-          const h = hashRes.img?.height
-          const hashString = hashRes.blurhash?.hash
 
-          await handleSave({...values, h, w, hash: hashString});
+          const _url = new URL(values.url);
+
+          if (_url.host !== "images.unsplash.com") {
+            actions.setErrors({url:"Photo URL host must images.unsplash.com"})
+            actions.setSubmitting(false);
+            return;
+          }
+
+          const hashRes = await hash(values.url);
+          const w = hashRes.img?.width;
+          const h = hashRes.img?.height;
+          const hashString = hashRes.blurhash?.hash;
+
+          await handleSave({ ...values, h, w, hash: hashString });
 
           actions.setSubmitting(false);
           handleClose();
