@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/novanda1/my-unsplash/storage"
@@ -42,6 +41,48 @@ type SearchImageDTO struct {
 	Cursor string `query:"cursor"`
 	Limit  int64  `query:"limit"`
 	Search string `query:"search"`
+}
+
+func paginateImages(storage *storage.Connection, p *SearchImageDTO) ([]Image, error) {
+	ctx := context.Background()
+	images := make([]Image, 0)
+
+	err := CreateIndex(storage)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.D{}
+	opts := options.FindOptions{Limit: &p.Limit, Sort: bson.D{{Key: "_id", Value: -1}}}
+
+	if p.Cursor != "" {
+		lastId, err := primitive.ObjectIDFromHex(p.Cursor)
+		if err != nil {
+			return nil, err
+		}
+
+		filter = append(filter, bson.E{Key: "_id", Value: bson.D{{Key: "$lt", Value: lastId}}})
+	}
+
+	if p.Search != "" {
+		filter = append(filter, bson.E{Key: "$text", Value: bson.D{{Key: "$search", Value: p.Search}}})
+	}
+
+	cursor, err := storage.ImageCollection().Find(context.TODO(), filter, &opts)
+	if err != nil {
+		return nil, err
+	}
+
+	for cursor.Next(ctx) {
+		var image Image
+		if err := cursor.Decode(&image); err != nil {
+			logrus.Println(err)
+		}
+
+		images = append(images, image)
+	}
+
+	return images, nil
 }
 
 func SaveImage(storage *storage.Connection, p *InsertImageDTO) (*Image, error) {
@@ -92,31 +133,13 @@ func DeleteImage(storage *storage.Connection, id string) (bool, error) {
 }
 
 func GetImages(storage *storage.Connection, p *GetImageDTO) ([]Image, error) {
-	images := make([]Image, 0)
-	ctx := context.Background()
+	var params SearchImageDTO
+	params.Cursor = p.Cursor
+	params.Limit = p.Limit
 
-	var lastIdPrimitive primitive.ObjectID
-	lastId, err := primitive.ObjectIDFromHex(p.Cursor)
-	if err == nil {
-		lastIdPrimitive = lastId
-	}
-
-	opts := options.FindOptions{Limit: &p.Limit, Sort: bson.M{"createdat": -1}}
-	filter := bson.M{
-		"_id": bson.D{{Key: "$gt", Value: lastIdPrimitive}},
-	}
-	cursor, err := storage.ImageCollection().Find(ctx, filter, &opts)
+	images, err := paginateImages(storage, &params)
 	if err != nil {
 		return nil, err
-	}
-
-	for cursor.Next(ctx) {
-		var image Image
-		if err := cursor.Decode(&image); err != nil {
-			log.Println(err)
-		}
-
-		images = append(images, image)
 	}
 
 	return images, nil
@@ -562,34 +585,9 @@ func CreateIndex(storage *storage.Connection) error {
 }
 
 func Search(storage *storage.Connection, p *SearchImageDTO) ([]Image, error) {
-	ctx := context.Background()
-	images := make([]Image, 0)
-
-	err := CreateIndex(storage)
+	images, err := paginateImages(storage, p)
 	if err != nil {
 		return nil, err
-	}
-
-	opts := options.FindOptions{Limit: &p.Limit, Sort: bson.M{"createdat": -1}}
-	var filter bson.M
-	if p.Search != "" {
-		filter = bson.M{
-			"$text": bson.D{{Key: "$search", Value: p.Search}},
-		}
-	}
-
-	cursor, err := storage.ImageCollection().Find(context.TODO(), filter, &opts)
-	if err != nil {
-		return nil, err
-	}
-
-	for cursor.Next(ctx) {
-		var image Image
-		if err := cursor.Decode(&image); err != nil {
-			logrus.Println(err)
-		}
-
-		images = append(images, image)
 	}
 
 	return images, nil
