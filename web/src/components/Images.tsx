@@ -1,4 +1,4 @@
-import { Container } from "@chakra-ui/react";
+import { Box, Container } from "@chakra-ui/react";
 import React, { useContext, useEffect } from "react";
 import Masonry from "react-masonry-component";
 import { useWindowSize } from "usehooks-ts";
@@ -35,14 +35,16 @@ const Images: React.FC = () => {
 
   return (
     <Container maxW="container.xl" pb={50}>
-      {/* @ts-ignore */}
-      <Masonry className="gallery" elementType={"ul"}>
-        {images?.response?.data.map((img) => (
-          <li className="imgContainer" key={img.id}>
-            <ImageItem img={img} />
-          </li>
-        ))}
-      </Masonry>
+      <Box margin="-0.5rem">
+        {/* @ts-ignore */}
+        <Masonry className="gallery" elementType={"ul"}>
+          {images?.response?.data.map((img) => (
+            <li className="imgContainer" key={img.id}>
+              <ImageItem img={img} />
+            </li>
+          ))}
+        </Masonry>
+      </Box>
     </Container>
   );
 };

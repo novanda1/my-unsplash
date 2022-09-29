@@ -37,9 +37,21 @@ ul {
 }
 
 .imgContainer {
-  width: 30%;
-  margin: 0.5rem;
+  width: 100%;
+  padding: 0.5rem;
   position: absolute;
+}
+
+@media (min-width: 640px) {
+  .imgContainer {
+    width: calc(100% / 2);
+  }
+}
+
+@media (min-width: 992px) {
+  .imgContainer {
+    width: calc(100% / 3);
+  }
 }
 
 .imgContainer img {

@@ -40,10 +40,20 @@ const Navigation: React.FC = () => {
     <Box as="section" pb={{ base: "12", md: "51px" }}>
       <Box as="nav" bg="bg-surface">
         <Container py={{ base: "4", lg: "5" }} maxW="container.xl">
-          <HStack spacing="10" justify="space-between">
-            <HStack>
-              <Logo />
-              <InputGroup>
+          <HStack
+            spacing="10"
+            justify={["flex-start", "space-between"]}
+            flexWrap={["wrap", "nowrap"]}
+            gap={[5]}
+          >
+            <Logo />
+
+            <HStack
+              justifyContent="space-between"
+              w="100%"
+              style={{ marginLeft: 0 }}
+            >
+              <InputGroup w="max-content" flex={[1,"unset"]}>
                 <InputLeftElement
                   pointerEvents="none"
                   children={<Search2Icon color="gray.300" />}
@@ -55,10 +65,10 @@ const Navigation: React.FC = () => {
                   onChange={handleQueryChange}
                 />
               </InputGroup>
+              <Button colorScheme="green" fontSize={14} onClick={openModal}>
+                Add a photo
+              </Button>
             </HStack>
-            <Button colorScheme="green" fontSize={14} onClick={openModal}>
-              Add a photo
-            </Button>
 
             <Modal isOpen={isOpen} onClose={closeModal}>
               <ModalOverlay />

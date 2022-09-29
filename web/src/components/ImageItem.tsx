@@ -37,7 +37,6 @@ const ImageItem: React.FC<{ img: TImage }> = ({ img }) => {
         right={0}
         left={0}
         opacity={0}
-        // bgGradient="linear(to-t, transparent 0%, gray.200 100%)"
         transition="opacity 300ms ease"
         h="80%"
         p={18}
