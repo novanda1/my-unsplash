@@ -59,12 +59,10 @@ export const useSearch = (key: SearchImagesDTO) => {
   };
 };
 
-export const useSaveImage = () => {
+export const useImageActions = () => {
   const { mutate: _mutate } = useContext(ImagesContext);
 
   const handleSave = async (param: SaveImageDTO) => {
-    if (typeof _mutate.mutate !== "function") return;
-
     let saveResponse = await api.saveImage(param);
 
     if (saveResponse.status === "error") return;
@@ -80,23 +78,15 @@ export const useSaveImage = () => {
     );
   };
 
-  return {
-    handleSave,
-  };
-};
-
-export const useDelete = () => {
-  const { mutate } = useContext(ImagesContext);
-
   const handleDelete = async (id: string) => {
-    if (mutate === null) return;
+    if (typeof _mutate.mutate !== "function") return;
 
     const deleteReq = await api.deleteImage(id);
     if (!deleteReq.data) return;
 
     try {
       let data;
-      await (mutate.mutate as KeyedMutator<ImageResponse<TImage[]>[]>)(
+      await (_mutate.mutate as KeyedMutator<ImageResponse<TImage[]>[]>)(
         (data) => {
           const deleted = data?.map((d) => ({
             ...d,
@@ -116,13 +106,13 @@ export const useDelete = () => {
     }
   };
 
-  return { handleDelete };
-};
-
-export const useHash = () => {
   const hash = async (url: string) => {
     return await api.hash(url);
   };
 
-  return { hash };
+  return {
+    handleSave,
+    handleDelete,
+    hash,
+  };
 };

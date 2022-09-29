@@ -9,10 +9,10 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Text
+  Text,
 } from "@chakra-ui/react";
 import { Formik } from "formik";
-import { useDelete } from "../hooks/useImage";
+import { useImageActions } from "../hooks/useImage";
 
 import * as Yup from "yup";
 
@@ -25,7 +25,7 @@ const DeleteImageModal: React.FC<{
     pw: Yup.string().required().min(6).label("Password"),
   });
 
-  const { handleDelete } = useDelete();
+  const { handleDelete } = useImageActions();
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose}>

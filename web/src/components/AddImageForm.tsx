@@ -10,7 +10,7 @@ import {
 import { Formik } from "formik";
 
 import * as Yup from "yup";
-import { useHash, useSaveImage } from "../hooks/useImage";
+import { useImageActions } from "../hooks/useImage";
 
 const AddImageForm: React.FC<{ handleClose: () => void }> = ({
   handleClose,
@@ -20,8 +20,7 @@ const AddImageForm: React.FC<{ handleClose: () => void }> = ({
     url: Yup.string().required().url().label("Photo URL"),
   });
 
-  const { handleSave } = useSaveImage();
-  const { hash } = useHash();
+  const { handleSave, hash } = useImageActions();
 
   return (
     <Box>
@@ -37,7 +36,9 @@ const AddImageForm: React.FC<{ handleClose: () => void }> = ({
           const _url = new URL(values.url);
 
           if (_url.host !== "images.unsplash.com") {
-            actions.setErrors({url:"Photo URL host must images.unsplash.com"})
+            actions.setErrors({
+              url: "Photo URL host must images.unsplash.com",
+            });
             actions.setSubmitting(false);
             return;
           }
