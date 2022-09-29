@@ -31,7 +31,7 @@ func NewApi(config *conf.GlobalConfiguration, db *storage.Connection) *API {
 	app := fiber.New()
 	app.Use(logger.New())
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "*",
+		AllowOrigins: api.config.API.ExternalURL,
 	}))
 
 	api_route := app.Group("/api")
